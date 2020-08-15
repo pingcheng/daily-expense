@@ -67,6 +67,7 @@
 	import { AuthService } from "@/services/auth/AuthService";
 	import RegisterPayload from "@/models/auth/RegisterPayload";
 	import FormErrorResponse from "@/base/api/errors/FormErrorResponse";
+	import { applyErrorMessages, clearErrorMessages } from "@/helpers/validations/Validation";
 
 	export default {
 		name: "Register",
@@ -104,7 +105,7 @@
 
 		methods: {
 			async register() {
-				this.clearFormMessage();
+				clearErrorMessages(this.errorMessage);
 				if (!this.$refs.form.validate()) {
 					return;
 				}
@@ -113,11 +114,7 @@
 				const response = await AuthService.register(new RegisterPayload(this.email, this.name, this.password));
 
 				if (response instanceof FormErrorResponse) {
-					response.getErrorKeys().forEach((key) => {
-						if (Object.prototype.hasOwnProperty.call(this.errorMessage, key)) {
-							this.errorMessage[key] = response.getError(key);
-						}
-					});
+					applyErrorMessages(this.errorMessage, response.getErrors());
 				} else if (response === true) {
 					this.registerSuccessDialog = true;
 				} else {
@@ -125,12 +122,6 @@
 				}
 
 				this.inProgress = false;
-			},
-
-			clearFormMessage() {
-				for (const key in this.errorMessage) {
-					this.errorMessage[key] = [];
-				}
 			}
 		}
 	}

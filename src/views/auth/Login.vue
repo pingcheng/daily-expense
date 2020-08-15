@@ -39,6 +39,7 @@
 	import { AuthService } from "@/services/auth/AuthService";
 	import Rules from "@/helpers/validations/Rules";
 	import FormErrorResponse from "@/base/api/errors/FormErrorResponse";
+	import { applyErrorMessages, clearErrorMessages } from "@/helpers/validations/Validation";
 
 	export default {
 		name: "Login",
@@ -61,10 +62,8 @@
 
 		methods: {
 			async login() {
-				this.clearErrorMessages();
-				const valid = this.$refs.form.validate();
-
-				if (!valid) {
+				clearErrorMessages(this.errorMessage);
+				if (!this.$refs.form.validate()) {
 					return;
 				}
 
@@ -72,11 +71,7 @@
 				const response = await AuthService.login(credential);
 
 				if (response instanceof FormErrorResponse) {
-					response.getErrorKeys().forEach((key) => {
-						if (Object.prototype.hasOwnProperty.call(this.errorMessage, key)) {
-							this.errorMessage[key] = response.getError(key);
-						}
-					});
+					applyErrorMessages(this.errorMessage, response.getErrors());
 				} else if (response) {
 					await this.$router.push({
 						path: "/"
@@ -84,10 +79,6 @@
 				} else {
 					alert("Unknown error.");
 				}
-			},
-
-			clearErrorMessages() {
-				Object.keys(this.errorMessage).forEach((key) => this.errorMessage[key] = []);
 			}
 		}
 	}
