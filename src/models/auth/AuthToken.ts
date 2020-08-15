@@ -20,6 +20,10 @@ export default class AuthToken extends AuthTokenDto {
         return moment().isAfter(this.expiresAt);
     }
 
+    needRefresh(): boolean {
+        return this.expiresAt.diff(moment(), 'days') < 7;
+    }
+
     getHeaderString(): string {
         return `Bearer ${this.accessToken}`;
     }

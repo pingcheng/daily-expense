@@ -7,6 +7,7 @@ export class AuthTokenService {
     private static readonly AUTH_TOKEN_EXPIRES = "auth_token_expires";
 
     public static persist(token: AuthTokenDto) {
+        this.destroy();
         localStorage.setItem(this.AUTH_TOKEN, token.accessToken);
         localStorage.setItem(this.AUTH_TOKEN_EXPIRES, token.expiresAt.valueOf().toString())
     }

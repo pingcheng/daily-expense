@@ -1,6 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { apiConfig } from "@/base/api/apiConfig";
 import { AuthTokenService } from "@/services/auth/AuthTokenService";
+import { EventBus } from "@/event-bus.ts";
+import { hasKey } from "@/helpers/helpers.ts";
+import { AuthTokenDto } from "@/models/auth/AuthToken.ts";
+import moment from "moment";
 
 export class Api {
 
@@ -24,10 +28,38 @@ export class Api {
         // Create the api instance.
         this.api = axios.create(config);
 
+        this.api.interceptors.request.use((config) => {
+
+            // If the token need to be refresh, then add the header to request a new one.
+            if (AuthTokenService.get()?.needRefresh()) {
+                config.headers["X-Refresh-Token"] = "1";
+            }
+
+            return config;
+        });
+
         this.api.interceptors.response.use(
-            (response) => response,
+            (response) => {
+
+                // If found the new token and expires time, then replace the local one.
+                if (hasKey(response.headers, 'x-new-token') && hasKey(response.headers, 'x-new-token-expires')) {
+                    const authToken = new AuthTokenDto();
+                    authToken.accessToken = response.headers["x-new-token"];
+                    authToken.expiresAt = moment(response.headers["x-new-token-expires"]);
+                    AuthTokenService.persist(authToken);
+                }
+
+                return response;
+            },
             error => {
                 if (error.response) {
+
+                    // If status is 401, then log out the app.
+                    if (error.response.status === 401) {
+                        AuthTokenService.destroy();
+                        EventBus.$emit("logout");
+                    }
+
                     return Promise.resolve(error.response);
                 } else {
                     return Promise.reject(error);
