@@ -8,20 +8,22 @@ import { AuthTokenService } from "@/services/auth/AuthTokenService";
 import RegisterPayload from "@/models/auth/RegisterPayload";
 
 export class AuthService {
-    public static async login(credential: LoginCredential): Promise<AuthToken|null> {
+    public static async login(credential: LoginCredential): Promise<AuthToken|FormErrorResponse|null> {
         const api = Api.getInstance();
-        const response: AxiosResponse<LoginResponsePayload> = await api.post('/auth/login', {
+        const response: AxiosResponse<ApiResponse<LoginResponsePayload|FormError>> = await api.post('/auth/login', {
             email: credential.getEmail(),
             password: credential.getPassword()
         });
 
         if (response.status === 200) {
             const tokenDto = new AuthTokenDto();
-            tokenDto.accessToken = response.data.payload.token.accessToken;
-            tokenDto.expiresAt = moment(response.data.payload.token.expires);
+            const payload = response.data.payload as LoginResponsePayload;
+            tokenDto.accessToken = payload.token.accessToken;
+            tokenDto.expiresAt = moment(payload.token.expires);
             AuthTokenService.persist(tokenDto);
-
             return new AuthToken(tokenDto);
+        } else if (response.status === 422) {
+            return new FormErrorResponse(response.data.payload as FormError);
         }
 
         return null;
@@ -56,14 +58,12 @@ export class AuthService {
 }
 
 interface LoginResponsePayload {
-    payload: {
-        user: {
-            id: number;
-            name: string;
-        };
-        token: {
-            accessToken: string;
-            expires: string;
-        };
+    user: {
+        id: number;
+        name: string;
+    };
+    token: {
+        accessToken: string;
+        expires: string;
     };
 }
