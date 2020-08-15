@@ -71,7 +71,6 @@
 				const credential = LoginCredential.with(this.email, this.password);
 				const response = await AuthService.login(credential);
 
-				console.log(response);
 				if (response instanceof FormErrorResponse) {
 					response.getErrorKeys().forEach((key) => {
 						if (Object.prototype.hasOwnProperty.call(this.errorMessage, key)) {
