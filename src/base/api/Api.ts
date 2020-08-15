@@ -76,7 +76,3 @@ export interface ApiResponse<B> {
     payload: B;
     message: string;
 }
-
-export interface FormError {
-    [key: string]: Array<string>;
-}

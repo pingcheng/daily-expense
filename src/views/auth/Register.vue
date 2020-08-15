@@ -66,6 +66,7 @@
 	import Rules from "@/helpers/validations/Rules";
 	import { AuthService } from "@/services/auth/AuthService";
 	import RegisterPayload from "@/models/auth/RegisterPayload";
+	import FormErrorResponse from "@/base/api/errors/FormErrorResponse";
 
 	export default {
 		name: "Register",
@@ -111,15 +112,13 @@
 				this.inProgress = true;
 				const response = await AuthService.register(new RegisterPayload(this.email, this.name, this.password));
 
-				if (response instanceof Object) {
-					Object.keys(response).forEach((key) => {
+				if (response instanceof FormErrorResponse) {
+					response.getErrorKeys().forEach((key) => {
 						if (Object.prototype.hasOwnProperty.call(this.errorMessage, key)) {
-							this.errorMessage[key] = response[key];
+							this.errorMessage[key] = response.getError(key);
 						}
 					});
-				}
-
-				if (response === true) {
+				} else if (response === true) {
 					this.registerSuccessDialog = true;
 				} else {
 					alert('Something wrong... please try again later');

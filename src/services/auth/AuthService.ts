@@ -1,5 +1,6 @@
 import { LoginCredential } from "@/models/auth/LoginCredential";
-import { Api, ApiResponse, FormError } from "@/base/api/Api";
+import { Api, ApiResponse } from "@/base/api/Api";
+import FormErrorResponse, { FormError } from "@/base/api/errors/FormErrorResponse.ts";
 import { AxiosResponse } from "axios";
 import AuthToken, { AuthTokenDto } from "@/models/auth/AuthToken";
 import moment from "moment";
@@ -26,7 +27,7 @@ export class AuthService {
         return null;
     }
 
-    public static async register(registerPayload: RegisterPayload): Promise<boolean|FormError> {
+    public static async register(registerPayload: RegisterPayload): Promise<boolean|FormErrorResponse> {
         const response: AxiosResponse<ApiResponse<null|FormError>> = await Api.getInstance().post('/auth/register', {
             email: registerPayload.getEmail(),
             name: registerPayload.getName(),
@@ -36,7 +37,7 @@ export class AuthService {
         if (response.status === 200) {
             return true;
         } else if (response.status === 422) {
-            return response.data.payload as FormError;
+            return new FormErrorResponse(response.data.payload as FormError);
         } else {
             return false;
         }
