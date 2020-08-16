@@ -31,11 +31,12 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 	import { AuthService } from "@/services/auth/AuthService";
 	import { EventBus } from "@/event-bus";
+	import Vue from "vue";
 
-	export default {
+	export default Vue.extend({
 		name: "TopBarUserMenu",
 
 		data() {
@@ -52,7 +53,7 @@
 				this.logoutDialog = false;
 			}
 		}
-	}
+	});
 </script>
 
 <style scoped>

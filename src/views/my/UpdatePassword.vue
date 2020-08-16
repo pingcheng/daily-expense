@@ -43,13 +43,15 @@
 	</v-container>
 </template>
 
-<script>
+<script lang="ts">
 	import Rules from "@/helpers/validations/Rules";
 	import { applyErrorMessages, clearErrorMessages } from "@/helpers/validations/Validation";
 	import MyService from "@/services/my/MyService";
 	import FormErrorResponse from "@/base/api/errors/FormErrorResponse";
+	import Vue from "vue";
+	import { VForm } from "@/plugins/vuetify.ts";
 
-	export default {
+	export default Vue.extend({
 		name: "UpdatePassword",
 
 		data() {
@@ -70,19 +72,23 @@
 		},
 
 		computed: {
-			inputDisabled() {
-				return this.inProgress === true;
+			inputDisabled(): boolean {
+				return this.inProgress;
 			},
 
 			passwordConfirmationRule() {
 				return () => (this.newPassword === this.newPasswordConfirm) || 'Password does not match.'
+			},
+
+			form(): VForm {
+				return this.$refs.form as VForm;
 			}
 		},
 
 		methods: {
 			async updatePassword() {
 				clearErrorMessages(this.errorMessage);
-				if (!this.$refs.form.validate()) {
+				if (!this.form.validate()) {
 					return;
 				}
 
@@ -91,7 +97,7 @@
 				const response = await MyService.updatePassword(this.currentPassword, this.newPassword);
 				if (response instanceof FormErrorResponse) {
 					applyErrorMessages(this.errorMessage, response.getErrors());
-				} else if (response === true) {
+				} else if (response) {
 					alert('Updated!');
 					this.currentPassword = '';
 					this.newPassword = '';
@@ -103,7 +109,7 @@
 				this.inProgress = false;
 			},
 		}
-	}
+	});
 </script>
 
 <style scoped>

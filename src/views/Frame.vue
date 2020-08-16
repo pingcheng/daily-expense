@@ -49,11 +49,13 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 	import MyService from "@/services/my/MyService";
-	import TopBarUserMenu from "@/components/topbar/TopBarUserMenu";
+	import TopBarUserMenu from "@/components/topbar/TopBarUserMenu.vue";
+	import Vue from "vue";
+	import User from "@/models/users/User.ts";
 
-	export default {
+	export default Vue.extend({
 		name: "Frame",
 		components: {TopBarUserMenu},
 		data() {
@@ -68,13 +70,13 @@
 			this.loadMyInfoDialog = true;
 
 			const user = await MyService.getMyInfo();
-			if (user) {
+			if (user instanceof User) {
 				this.$store.commit('my/update', user);
 			}
 
 			this.loadMyInfoDialog = false;
 		}
-	}
+	});
 </script>
 
 <style scoped>

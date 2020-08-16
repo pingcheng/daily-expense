@@ -34,14 +34,16 @@
 	</v-container>
 </template>
 
-<script>
+<script lang="ts">
 	import { LoginCredential } from "@/models/auth/LoginCredential";
 	import { AuthService } from "@/services/auth/AuthService";
 	import Rules from "@/helpers/validations/Rules";
 	import FormErrorResponse from "@/base/api/errors/FormErrorResponse";
 	import { applyErrorMessages, clearErrorMessages } from "@/helpers/validations/Validation";
+	import Vue from "vue";
+	import { VForm } from "@/plugins/vuetify.ts";
 
-	export default {
+	export default Vue.extend({
 		name: "Login",
 
 		data() {
@@ -60,10 +62,16 @@
 			}
 		},
 
+		computed: {
+			form(): VForm {
+				return this.$refs.form as VForm;
+			}
+		},
+
 		methods: {
 			async login() {
 				clearErrorMessages(this.errorMessage);
-				if (!this.$refs.form.validate()) {
+				if (!this.form.validate()) {
 					return;
 				}
 
@@ -81,7 +89,7 @@
 				}
 			}
 		}
-	}
+	});
 </script>
 
 <style scoped>

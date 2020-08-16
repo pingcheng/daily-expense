@@ -5,3 +5,7 @@ Vue.use(Vuetify);
 
 export default new Vuetify({
 });
+
+export type VForm = Vue & {
+    validate: () => boolean;
+};

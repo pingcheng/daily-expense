@@ -62,14 +62,16 @@
 	</v-container>
 </template>
 
-<script>
+<script lang="ts">
 	import Rules from "@/helpers/validations/Rules";
 	import { AuthService } from "@/services/auth/AuthService";
 	import RegisterPayload from "@/models/auth/RegisterPayload";
 	import FormErrorResponse from "@/base/api/errors/FormErrorResponse";
 	import { applyErrorMessages, clearErrorMessages } from "@/helpers/validations/Validation";
+	import Vue from "vue";
+	import { VForm } from "@/plugins/vuetify.ts";
 
-	export default {
+	export default Vue.extend({
 		name: "Register",
 
 		data() {
@@ -94,19 +96,23 @@
 		},
 
 		computed: {
-			inputDisabled() {
-				return this.inProgress === true;
+			inputDisabled(): boolean {
+				return this.inProgress;
 			},
 
 			passwordConfirmationRule() {
 				return () => (this.password === this.passwordConfirm) || 'Password does not match.'
+			},
+
+			form(): VForm {
+				return this.$refs.form as VForm;
 			}
 		},
 
 		methods: {
 			async register() {
 				clearErrorMessages(this.errorMessage);
-				if (!this.$refs.form.validate()) {
+				if (!this.form.validate()) {
 					return;
 				}
 
@@ -115,7 +121,7 @@
 
 				if (response instanceof FormErrorResponse) {
 					applyErrorMessages(this.errorMessage, response.getErrors());
-				} else if (response === true) {
+				} else if (response) {
 					this.registerSuccessDialog = true;
 				} else {
 					alert('Something wrong... please try again later');
@@ -124,7 +130,7 @@
 				this.inProgress = false;
 			}
 		}
-	}
+	});
 </script>
 
 <style scoped>
