@@ -4,9 +4,8 @@ import { AxiosResponse } from "axios";
 import FormErrorResponse, { FormError } from "@/base/api/errors/FormErrorResponse.ts";
 
 export default class MyService {
-    public static async getMyInfo(): Promise<User|null> {
-        const api = Api.getInstance();
-        const response: AxiosResponse<ApiResponse<UserDTO>> = await api.get('/my');
+    public static async getProfile(): Promise<User|null> {
+        const response: AxiosResponse<ApiResponse<UserDTO>> = await Api.getInstance().get('/my/profile');
 
         if (response.status === 200) {
             return new User(response.data.payload);

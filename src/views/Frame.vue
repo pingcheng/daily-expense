@@ -69,7 +69,7 @@
 		async created() {
 			this.loadMyInfoDialog = true;
 
-			const user = await MyService.getMyInfo();
+			const user = await MyService.getProfile();
 			if (user instanceof User) {
 				this.$store.commit('my/update', user);
 			}

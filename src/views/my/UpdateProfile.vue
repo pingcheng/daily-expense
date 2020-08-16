@@ -95,7 +95,7 @@
 			async loadMyProfile() {
 				this.dialog.loadingMyInfo = true;
 
-				const user = await MyService.getMyInfo();
+				const user = await MyService.getProfile();
 				if (user instanceof User) {
 					this.user = user;
 					this.$store.commit('my/update', this.user);
