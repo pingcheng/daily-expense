@@ -9,7 +9,7 @@ const Rules = {
     },
 
     min7(value: string) {
-        return (value && value.length >= 7) || "Minimum 7 characters.";
+        return (value && value.trim().length >= 7) || "Minimum 7 characters.";
     }
 };
 

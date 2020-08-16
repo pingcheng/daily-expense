@@ -14,6 +14,9 @@
 				<v-list-item to="/my/password">
 					<v-list-item-title>Update password</v-list-item-title>
 				</v-list-item>
+				<v-list-item to="/my/profile">
+					<v-list-item-title>My profile</v-list-item-title>
+				</v-list-item>
 				<v-list-item @click="logout">
 					<v-list-item-title>Logout</v-list-item-title>
 				</v-list-item>

@@ -44,6 +44,11 @@ Vue.use(VueRouter)
           path: "/my/password",
           name: "UpdatePassword",
           component: () => import("@/views/my/UpdatePassword.vue" /* webpackChunkName: "update-password" */)
+        },
+        {
+          path: "/my/profile",
+          name: "UpdateProfile",
+          component: () => import("@/views/my/UpdateProfile.vue" /* webpackChunkName: "update-profile" */)
         }
       ]
     },

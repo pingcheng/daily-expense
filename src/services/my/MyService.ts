@@ -15,6 +15,18 @@ export default class MyService {
         return null;
     }
 
+    public static async updateProfile(user: User): Promise<boolean|FormErrorResponse> {
+        const response: AxiosResponse<ApiResponse<null|FormError>> = await Api.getInstance().post('/my/profile', {
+            name: user.name
+        });
+
+        switch (response.status) {
+            case 422: return new FormErrorResponse(response.data.payload as FormError);
+            case 200: return true;
+            default: return false;
+        }
+    }
+
     /**
      * Update the current user's password.
      *
