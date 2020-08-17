@@ -1,8 +1,8 @@
-import User, { UserDTO } from "@/models/users/User";
+import User, { UserDto } from "@/models/users/User";
 import { Module } from "vuex";
 import RootState from "@/store/RootState.ts";
 
-const ProfileStore: Module<UserDTO, RootState> = {
+const ProfileStore: Module<UserDto, RootState> = {
     namespaced: true,
     state: {
         id: 0,
@@ -12,7 +12,7 @@ const ProfileStore: Module<UserDTO, RootState> = {
     },
 
     mutations: {
-        update(state: UserDTO, user: User) {
+        update(state: UserDto, user: User) {
             state.id = user.id;
             state.name = user.name;
             state.email = user.name;

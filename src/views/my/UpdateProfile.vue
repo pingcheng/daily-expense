@@ -39,7 +39,7 @@
 <script lang="ts">
 	import Vue from "vue";
 	import MyService from "@/services/my/MyService.ts";
-	import User, { UserDTO } from "@/models/users/User.ts";
+	import User, { UserDto } from "@/models/users/User.ts";
 	import Rules from "@/helpers/validations/Rules.ts";
 	import { applyErrorMessages, clearErrorMessages } from "@/helpers/validations/Validation.ts";
 	import { validateForm, VForm } from "@/plugins/vuetify.ts";
@@ -60,7 +60,7 @@
 					name: []
 				},
 
-				user: new User(new UserDTO()),
+				user: new User(new UserDto()),
 			}
 		},
 

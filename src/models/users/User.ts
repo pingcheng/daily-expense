@@ -5,15 +5,15 @@ export interface UserInterface {
     avatar: string;
 }
 
-export class UserDTO implements UserInterface {
+export class UserDto implements UserInterface {
     id = 0;
     email = '';
     name = '';
     avatar = '';
 }
 
-export default class User extends UserDTO {
-    constructor(dto: UserDTO) {
+export default class User extends UserDto {
+    constructor(dto: UserDto) {
         super();
         Object.assign(this, dto);
     }

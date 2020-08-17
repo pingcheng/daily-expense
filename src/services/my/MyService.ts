@@ -1,11 +1,11 @@
-import User, { UserDTO } from "@/models/users/User";
+import User, { UserDto } from "@/models/users/User";
 import { Api, ApiResponse } from "@/base/api/Api";
 import { AxiosResponse } from "axios";
 import FormErrorResponse, { FormError } from "@/base/api/errors/FormErrorResponse.ts";
 
 export default class MyService {
     public static async getProfile(): Promise<User|null> {
-        const response: AxiosResponse<ApiResponse<UserDTO>> = await Api.getInstance().get('/my/profile');
+        const response: AxiosResponse<ApiResponse<UserDto>> = await Api.getInstance().get('/my/profile');
 
         if (response.status === 200) {
             return new User(response.data.payload);
