@@ -3,7 +3,7 @@ import { AxiosRequestConfig } from "axios";
 export const apiConfig: AxiosRequestConfig = {
     withCredentials: false,
     timeout: 30 * 1000,
-    baseURL: 'http://localhost:18000/api/v1',
+    baseURL: process.env.VUE_APP_API_ENDPOINT,
     headers: {
         common: {
             "Access-Control-Allow-Origin": "*",
