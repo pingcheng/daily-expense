@@ -1,7 +1,8 @@
-import { Module } from "vuex";
 import User, { UserDTO } from "@/models/users/User";
+import { Module } from "vuex";
+import RootState from "@/store/RootState.ts";
 
-const MyInfoStore: Module<UserDTO, UserDTO> = {
+const MyInfoStore: Module<UserDTO, RootState> = {
     namespaced: true,
     state: {
         id: 0,

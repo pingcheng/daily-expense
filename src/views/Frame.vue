@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-navigation-drawer v-model="drawer" app clipped>
+		<v-navigation-drawer v-model="$store.state.config.showSidebar" app clipped>
 			<v-list dense>
 				<v-list-item link to="/">
 					<v-list-item-action>
@@ -23,7 +23,7 @@
 		</v-navigation-drawer>
 
 		<v-app-bar app clipped-left>
-			<v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+			<v-app-bar-nav-icon @click.stop="toggleSidebar"></v-app-bar-nav-icon>
 			<v-toolbar-title>Daily Expense</v-toolbar-title>
 
 			<v-spacer></v-spacer>
@@ -54,15 +54,24 @@
 	import TopBarUserMenu from "@/components/topbar/TopBarUserMenu.vue";
 	import Vue from "vue";
 	import User from "@/models/users/User.ts";
+	import ConfigurationService from "@/services/config/ConfigurationService.ts";
+	import { Configuration } from "@/base/config/Configuration.ts";
 
 	export default Vue.extend({
 		name: "Frame",
 		components: {TopBarUserMenu},
 		data() {
 			return {
-				drawer: true,
-
 				loadMyInfoDialog: false,
+			}
+		},
+
+		methods: {
+			toggleSidebar() {
+				const config = this.$store.state.config;
+				config.showSidebar = !config.showSidebar;
+				this.$store.commit("config/update", config);
+				ConfigurationService.persist(new Configuration(config));
 			}
 		},
 
