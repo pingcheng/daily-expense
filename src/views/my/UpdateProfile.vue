@@ -98,7 +98,7 @@
 				const user = await MyService.getProfile();
 				if (user instanceof User) {
 					this.user = user;
-					this.$store.commit('my/update', this.user);
+					this.$store.commit('profile/update', this.user);
 				}
 
 				this.dialog.loadingMyInfo = false;

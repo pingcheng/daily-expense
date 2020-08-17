@@ -2,7 +2,7 @@ import User, { UserDTO } from "@/models/users/User";
 import { Module } from "vuex";
 import RootState from "@/store/RootState.ts";
 
-const MyInfoStore: Module<UserDTO, RootState> = {
+const ProfileStore: Module<UserDTO, RootState> = {
     namespaced: true,
     state: {
         id: 0,
@@ -21,4 +21,4 @@ const MyInfoStore: Module<UserDTO, RootState> = {
     }
 }
 
-export default MyInfoStore;
+export default ProfileStore;

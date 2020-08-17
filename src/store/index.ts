@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import MyInfoStore from "@/store/modules/MyInfoStore";
-import ConfigStore from "@/store/modules/Config.ts";
+import ProfileStore from "@/store/modules/ProfileStore.ts";
+import ConfigStore from "@/store/modules/ConfigStore.ts";
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   modules: {
-    my: MyInfoStore,
+    profile: ProfileStore,
     config: ConfigStore,
   }
 })

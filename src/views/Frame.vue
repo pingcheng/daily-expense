@@ -28,7 +28,7 @@
 
 			<v-spacer></v-spacer>
 
-			<top-bar-user-menu v-if="$store.state.my.id > 0"></top-bar-user-menu>
+			<top-bar-user-menu v-if="$store.state.profile.id > 0"></top-bar-user-menu>
 
 		</v-app-bar>
 
@@ -80,7 +80,7 @@
 
 			const user = await MyService.getProfile();
 			if (user instanceof User) {
-				this.$store.commit('my/update', user);
+				this.$store.commit('profile/update', user);
 			}
 
 			this.loadMyInfoDialog = false;

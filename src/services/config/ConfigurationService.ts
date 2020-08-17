@@ -1,4 +1,4 @@
-import { Configuration, ConfigurationDto } from "@/base/config/Configuration.ts";
+import { Configuration } from "@/base/config/Configuration.ts";
 
 export default class ConfigurationService {
 

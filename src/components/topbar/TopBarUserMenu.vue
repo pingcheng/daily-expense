@@ -4,9 +4,9 @@
 			<template v-slot:activator="{ on, attrs }">
 					<span v-bind="attrs" v-on="on">
 						<v-avatar size="32" class="mr-2">
-							<img :src="$store.state.my.avatar" alt="avatar">
+							<img :src="$store.state.profile.avatar" alt="avatar">
 						</v-avatar>
-						<span>{{ $store.state.my.name }}</span>
+						<span>{{ $store.state.profile.name }}</span>
 					</span>
 			</template>
 

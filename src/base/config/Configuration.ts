@@ -8,9 +8,11 @@ export class ConfigurationDto implements ConfigurationInterface {
 
 export class Configuration extends ConfigurationDto {
 
-    constructor(config: ConfigurationDto) {
+    constructor(config?: ConfigurationDto) {
         super();
-        this.load(config);
+        if (config) {
+            this.load(config);
+        }
     }
 
 
