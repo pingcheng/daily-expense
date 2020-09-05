@@ -41,6 +41,11 @@ Vue.use(VueRouter)
           component: () => import("@/views/expense/AddExpense.vue" /* webpackChunkName: "add-expense" */)
         },
         {
+          path: "/category",
+          name: "CategoryManagement",
+          component: () => import("@/views/category/CategoryManagement.vue" /* webpackChunkName: "category-management" */)
+        },
+        {
           path: "/my/password",
           name: "UpdatePassword",
           component: () => import("@/views/my/UpdatePassword.vue" /* webpackChunkName: "update-password" */)
