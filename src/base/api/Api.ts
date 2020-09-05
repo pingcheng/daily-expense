@@ -69,6 +69,7 @@ export class Api {
 
         this.get = this.get.bind(this);
         this.post = this.post.bind(this);
+        this.put = this.put.bind(this);
         this.delete = this.delete.bind(this);
     }
 
@@ -100,6 +101,22 @@ export class Api {
      */
     public post<T, B, R = AxiosResponse<T>> (url: string, data?: B, config?: AxiosRequestConfig): Promise<R> {
         return this.api.post(url, data, config);
+    }
+
+    /**
+     * HTTP PUT method.
+     *
+     * @access public
+     * @template T - `TYPE`: expected object.
+     * @template B - `BODY`: body request object.
+     * @template R - `RESPONSE`: expected object inside a axios response format.
+     * @param {string} url - endpoint you want to reach.
+     * @param {B} data - payload to be send as the `request body`,
+     * @param {AxiosRequestConfig} [config] - axios request configuration.
+     * @returns {Promise<R>} - HTTP [axios] response payload.
+     */
+    public put<T, B, R = AxiosResponse<T>> (url: string, data?: B, config?: AxiosRequestConfig): Promise<R> {
+        return this.api.put(url, data, config);
     }
 
     /**
