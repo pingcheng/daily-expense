@@ -12,5 +12,6 @@ export default class ErrorResponse {
 }
 
 export enum ErrorType {
-    FORM_ERROR
+    FORM_ERROR,
+    GENERAL_ERROR
 }
