@@ -69,6 +69,7 @@ export class Api {
 
         this.get = this.get.bind(this);
         this.post = this.post.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
     /**
@@ -101,6 +102,19 @@ export class Api {
         return this.api.post(url, data, config);
     }
 
+    /**
+     * HTTP DELETE method, `statusCode`: 204 No Content.
+     *
+     * @access public
+     * @template T - `TYPE`: expected object.
+     * @template R - `RESPONSE`: expected object inside a axios response format.
+     * @param {string} url - endpoint you want to reach.
+     * @param {AxiosRequestConfig} [config] - axios request configuration.
+     * @returns {Promise<R>} - HTTP [axios] response payload.
+     */
+    public delete<T, R = AxiosResponse<T>> (url: string, config?: AxiosRequestConfig): Promise<R> {
+        return this.api.delete(url, config);
+    }
 }
 
 export interface ApiResponse<B> {
