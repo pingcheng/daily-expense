@@ -19,7 +19,7 @@
 						<v-card-text>
 							<v-list rounded>
 								<v-list-item-group v-model="selectedCategory" color="primary">
-									<v-list-item v-for="(category, index) in categories.items" :key="index" @click="loadSubCategories(category.id)">
+									<v-list-item v-for="(category, index) in categories.items" :key="index">
 										<v-list-item-icon>
 											<v-icon color="red" v-if="category.type === categoryType.EXPENSE">mdi-minus</v-icon>
 											<v-icon color="green" v-if="category.type === categoryType.INCOME">mdi-plus</v-icon>
@@ -44,7 +44,7 @@
 					<v-card>
 						<v-card-title>
 							<span class="pr-4">Sub-category</span>
-							<v-btn color="primary" small v-if="selectedCategory !== null"><v-icon small>mdi-plus</v-icon> Add</v-btn>
+							<v-btn color="primary" small v-if="selectedCategory !== null" @click="openCreateSubCategoryDialog"><v-icon small>mdi-plus</v-icon> Add</v-btn>
 						</v-card-title>
 						<v-card-text v-if="selectedCategory === null">
 							Please choose a main category.
@@ -114,10 +114,33 @@
 					</v-form>
 				</v-card-text>
 				<v-card-actions>
-					<v-spacer>
-						<v-btn text :disabled="createCategoryDialog.loading" @click="closeCreateCategoryDialog">Cancel</v-btn>
-						<v-btn text color="primary" :disabled="createCategoryDialog.loading" @click="createCategory">Add</v-btn>
-					</v-spacer>
+					<v-spacer></v-spacer>
+					<v-btn text :disabled="createCategoryDialog.loading" @click="closeCreateCategoryDialog">Cancel</v-btn>
+					<v-btn text color="primary" :disabled="createCategoryDialog.loading" @click="createCategory">Add</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
+		<v-dialog v-model="createSubCategoryDialog.display" max-width="400" :persistent="true">
+			<v-card>
+				<v-card-title>Add Sub-category</v-card-title>
+				<v-card-text>
+					<v-form ref="createSubCategoryForm">
+						<v-text-field
+							label="Name"
+							v-model="createSubCategoryDialog.name"
+							type="text"
+							autofocus
+							:rules="[rules.required]"
+							:disabled="createSubCategoryDialog.loading"
+							:error-messages="createSubCategoryDialog.errorMessage.name"
+						></v-text-field>
+					</v-form>
+				</v-card-text>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn text :disabled="createSubCategoryDialog.loading" @click="closeCreateSubCategoryDialog">Cancel</v-btn>
+					<v-btn text color="primary" :disabled="createSubCategoryDialog.loading" @click="createSubCategory">Add</v-btn>
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
@@ -128,7 +151,7 @@
 import Vue from "vue";
 import RecordCategoryService from "@/services/records/RecordCategoryService";
 import RecordCategory, { RecordCategoryDto } from "../../models/records/RecordCategory";
-import RecordSubCategory from "../../models/records/RecordSubCategory";
+import RecordSubCategory, { RecordSubCategoryDto } from "../../models/records/RecordSubCategory";
 import PagedItems from "@/helpers/PagedItems";
 import { RecordCategoryType } from "@/models/records/RecordEnums";
 import GeneralErrorResponse from "@/base/api/errors/GeneralErrorResponse";
@@ -166,6 +189,15 @@ export default Vue.extend({
 						name: [],
 						type: [],
 					}
+				},
+
+				createSubCategoryDialog: {
+					display: false,
+					loading: false,
+					name: "",
+					errorMessage: {
+						name: [],
+					}
 				}
 			}
 		},
@@ -176,7 +208,6 @@ export default Vue.extend({
 			},
 
 			selectedCategoryInstance(): RecordCategory|null {
-
 				if (this.selectedCategory === null) {
 					return null;
 				}
@@ -186,6 +217,10 @@ export default Vue.extend({
 
 			createCategoryForm(): VForm {
 				return this.$refs.createCategoryForm as VForm;
+			},
+
+			createSubCategoryForm(): VForm {
+				return this.$refs.createSubCategoryForm as VForm;
 			}
 		},
 
@@ -195,13 +230,19 @@ export default Vue.extend({
 				if (response) {
 					this.categories = response;
 					this.selectedCategory = null;
+					this.selectedSubCategory = null;
 				} else {
 					alert('Failed to load category data');
 				}
 			},
 
-			async loadSubCategories(categoryId: number) {
-				const response = await RecordCategoryService.getSubCategories(categoryId);
+			async loadSubCategories() {
+				const category = this.selectedCategoryInstance;
+				if (category === null) {
+					return;
+				}
+
+				const response = await RecordCategoryService.getSubCategories(category.id);
 				if (response) {
 					this.subCategories = response;
 				} else {
@@ -254,10 +295,7 @@ export default Vue.extend({
 					alert(response.getErrorMessage());
 					return;
 				}
-
-				if (this.selectedCategoryInstance) {
-					await this.loadSubCategories(this.selectedCategoryInstance.id);
-				}
+				await this.loadSubCategories();
 			},
 
 			closeCreateCategoryDialog() {
@@ -294,6 +332,56 @@ export default Vue.extend({
 					await this.loadCategories();
 					this.closeCreateCategoryDialog();
 				}
+			},
+
+			closeCreateSubCategoryDialog() {
+				this.createSubCategoryDialog.display = false;
+				this.createSubCategoryDialog.loading = false;
+				this.createSubCategoryDialog.name = "";
+			},
+
+			openCreateSubCategoryDialog() {
+				this.closeCreateSubCategoryDialog();
+				this.createSubCategoryDialog.display = true;
+			},
+
+			async createSubCategory() {
+				clearErrorMessages(this.createSubCategoryDialog.errorMessage);
+				if (!this.createSubCategoryForm.validate()) {
+					return;
+				}
+
+				const category = this.selectedCategoryInstance;
+				const dto = new RecordSubCategoryDto();
+				dto.name = this.createSubCategoryDialog.name;
+
+				if (category === null) {
+					alert('Unknown main category');
+					return;
+				}
+
+				this.createSubCategoryDialog.loading = true;
+				const response = await RecordCategoryService.createSubCategory(category.id, dto);
+				this.createSubCategoryDialog.loading = false;
+
+				if (response instanceof FormErrorResponse) {
+					applyErrorMessages(this.createSubCategoryDialog.errorMessage, response.getErrors());
+				} else if (response instanceof GeneralErrorResponse) {
+					alert(response.getErrorMessage());
+				} else {
+					await this.loadSubCategories();
+					this.closeCreateSubCategoryDialog();
+				}
+			}
+		},
+
+		watch: {
+			async selectedCategory(value) {
+				if (value === undefined) {
+					this.selectedCategory = null;
+				}
+
+				await this.loadSubCategories();
 			}
 		},
 

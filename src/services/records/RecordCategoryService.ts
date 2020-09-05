@@ -68,9 +68,21 @@ export default class RecordCategoryService {
         });
 
         switch (response.status) {
-            case 200: return new RecordCategory(response.data.payload as RecordCategoryDto);
-            case 422: return new FormErrorResponse(response.data.payload as FormError);
-            default: return new GeneralErrorResponse(response.data.payload as ApiResponse<any>);
+            case 200: return new RecordCategory(response.data.payload);
+            case 422: return new FormErrorResponse(response.data.payload);
+            default: return new GeneralErrorResponse(response.data.payload);
+        }
+    }
+
+    public static async createSubCategory(categoryId: number, subCategoryDto: RecordSubCategoryDto): Promise<RecordSubCategory|FormErrorResponse|GeneralErrorResponse> {
+        const response: AxiosResponse<ApiResponse<RecordSubCategoryDto|FormError|any>> = await Api.getInstance().put(`/record/category/${categoryId}/subcategory`, {
+            name: subCategoryDto.name
+        });
+
+        switch (response.status) {
+            case 200: return new RecordSubCategory(response.data.payload);
+            case 422: return new FormErrorResponse(response.data.payload);
+            default: return new GeneralErrorResponse(response.data.payload);
         }
     }
 
