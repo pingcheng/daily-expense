@@ -5,6 +5,7 @@ import { Api, ApiResponse } from "@/base/api/Api";
 import PaginationData from "@/helpers/pagination/PaginationData";
 import RecordSubCategory, { RecordSubCategoryDto } from "@/models/records/RecordSubCategory";
 import GeneralErrorResponse from "@/base/api/errors/GeneralErrorResponse";
+import FormErrorResponse, { FormError } from "@/base/api/errors/FormErrorResponse";
 
 export default class RecordCategoryService {
 
@@ -58,6 +59,19 @@ export default class RecordCategoryService {
         }
 
         return null;
+    }
+    
+    public static async createCategory(categoryDto: RecordCategoryDto): Promise<RecordCategory|FormErrorResponse|GeneralErrorResponse> {
+        const response: AxiosResponse<ApiResponse<RecordCategoryDto|FormError|any>> = await Api.getInstance().put(`/record/category`, {
+            name: categoryDto.name,
+            type: categoryDto.type,
+        });
+
+        switch (response.status) {
+            case 200: return new RecordCategory(response.data.payload as RecordCategoryDto);
+            case 422: return new FormErrorResponse(response.data.payload as FormError);
+            default: return new GeneralErrorResponse(response.data.payload as ApiResponse<any>);
+        }
     }
 
     /**
