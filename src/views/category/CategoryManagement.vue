@@ -14,7 +14,7 @@
 					<v-card>
 						<v-card-title>
 							<span class="pr-4">Main Category</span>
-							<v-btn color="primary" small><v-icon small>mdi-plus</v-icon> Add</v-btn>
+							<v-btn color="primary" small @click="openCreateCategoryDialog"><v-icon small>mdi-plus</v-icon> Add</v-btn>
 						</v-card-title>
 						<v-card-text>
 							<v-list rounded>
@@ -84,19 +84,60 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
+
+		<v-dialog v-model="createCategoryDialog.display" max-width="400" :persistent="true">
+			<v-card>
+				<v-card-title>Add Category</v-card-title>
+				<v-card-text>
+					<v-form ref="createCategoryForm">
+						<v-text-field
+							label="Name"
+							v-model="createCategoryDialog.name"
+							type="string"
+							autofocus
+							:rules="[rules.required]"
+							:disabled="createCategoryDialog.loading"
+							:error-messages="createCategoryDialog.errorMessage.name"
+						></v-text-field>
+
+						<v-radio-group
+							label="Type"
+							v-model="createCategoryDialog.type"
+							:error-messages="createCategoryDialog.errorMessage.type"
+							:mandatory="true"
+							:disabled="createCategoryDialog.loading"
+							row
+						>
+							<v-radio label="Expense" :value="categoryType.EXPENSE"></v-radio>
+							<v-radio label="Income" :value="categoryType.INCOME"></v-radio>
+						</v-radio-group>
+					</v-form>
+				</v-card-text>
+				<v-card-actions>
+					<v-spacer>
+						<v-btn text :disabled="createCategoryDialog.loading" @click="closeCreateCategoryDialog">Cancel</v-btn>
+						<v-btn text color="primary" :disabled="createCategoryDialog.loading" @click="createCategory">Add</v-btn>
+					</v-spacer>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</div>
 </template>
 
 <script lang="ts">
-	import Vue from "vue";
-	import RecordCategoryService from "@/services/records/RecordCategoryService";
-	import RecordCategory from "../../models/records/RecordCategory";
-	import RecordSubCategory from "../../models/records/RecordSubCategory";
-	import PagedItems from "@/helpers/PagedItems";
-	import { RecordCategoryType } from "@/models/records/RecordEnums";
-	import GeneralErrorResponse from "@/base/api/errors/GeneralErrorResponse";
+import Vue from "vue";
+import RecordCategoryService from "@/services/records/RecordCategoryService";
+import RecordCategory, { RecordCategoryDto } from "../../models/records/RecordCategory";
+import RecordSubCategory from "../../models/records/RecordSubCategory";
+import PagedItems from "@/helpers/PagedItems";
+import { RecordCategoryType } from "@/models/records/RecordEnums";
+import GeneralErrorResponse from "@/base/api/errors/GeneralErrorResponse";
+import Rules from "@/helpers/validations/Rules";
+import FormErrorResponse from "@/base/api/errors/FormErrorResponse";
+import { VForm } from "@/plugins/vuetify";
+import { applyErrorMessages, clearErrorMessages } from "@/helpers/validations/Validation";
 
-	export default Vue.extend({
+export default Vue.extend({
 		name: "CategoryManagement",
 
 		data() {
@@ -109,9 +150,22 @@
 				selectedCategory: null,
 				selectedSubCategory: null,
 
+				rules: Rules,
+
 				deleteDialog: {
 					categoryInstance: null,
 					loading: false,
+				},
+
+				createCategoryDialog: {
+					display: false,
+					loading: false,
+					name: "",
+					type: RecordCategoryType.EXPENSE,
+					errorMessage: {
+						name: [],
+						type: [],
+					}
 				}
 			}
 		},
@@ -128,6 +182,10 @@
 				}
 
 				return this.categories.items[this.selectedCategory];
+			},
+
+			createCategoryForm(): VForm {
+				return this.$refs.createCategoryForm as VForm;
 			}
 		},
 
@@ -199,6 +257,42 @@
 
 				if (this.selectedCategoryInstance) {
 					await this.loadSubCategories(this.selectedCategoryInstance.id);
+				}
+			},
+
+			closeCreateCategoryDialog() {
+				this.createCategoryDialog.display = false;
+				this.createCategoryDialog.loading = false;
+				this.createCategoryDialog.name = "";
+				this.createCategoryDialog.type = RecordCategoryType.EXPENSE;
+			},
+
+			openCreateCategoryDialog() {
+				this.closeCreateCategoryDialog();
+				this.createCategoryDialog.display = true;
+			},
+
+			async createCategory() {
+				clearErrorMessages(this.createCategoryDialog.errorMessage);
+				if (!this.createCategoryForm.validate()) {
+					return;
+				}
+
+				const dto = new RecordCategoryDto();
+				dto.name = this.createCategoryDialog.name;
+				dto.type = this.createCategoryDialog.type;
+
+				this.createCategoryDialog.loading = true;
+				const response = await RecordCategoryService.createCategory(dto);
+				this.createCategoryDialog.loading = false;
+
+				if (response instanceof FormErrorResponse) {
+					applyErrorMessages(this.createCategoryDialog.errorMessage, response.getErrors());
+				} else if (response instanceof GeneralErrorResponse) {
+					alert(response.getErrorMessage());
+				} else {
+					await this.loadCategories();
+					this.closeCreateCategoryDialog();
 				}
 			}
 		},
