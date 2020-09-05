@@ -3,6 +3,8 @@ import RecordCategory, { RecordCategoryDto } from "@/models/records/RecordCatego
 import { AxiosResponse } from "axios";
 import { Api, ApiResponse } from "@/base/api/Api";
 import PaginationData from "@/helpers/pagination/PaginationData";
+import RecordSubCategory, { RecordSubCategoryDto } from "@/models/records/RecordSubCategory";
+import GeneralErrorResponse from "@/base/api/errors/GeneralErrorResponse";
 
 export default class RecordCategoryService {
 
@@ -35,5 +37,56 @@ export default class RecordCategoryService {
         }
 
         return null;
+    }
+
+    public static async getSubCategories(categoryId: number, paginationData: PaginationData = new PaginationData()): Promise<PagedItems<RecordSubCategory>|null> {
+        const response: AxiosResponse<ApiResponse<PagedItemsDto<RecordSubCategoryDto>>> = await Api.getInstance().get(`/record/category/${categoryId}/subcategories`, {
+            params: {
+                page: paginationData.requestPage,
+                perPage: paginationData.itemsPerPage,
+            }
+        });
+
+        if (response.status === 200) {
+            const dto = new PagedItemsDto<RecordSubCategory>();
+            dto.page = response.data.payload.page;
+            dto.items = response.data.payload.items.map((dto) => {
+                return new RecordSubCategory(dto);
+            });
+
+            return new PagedItems(dto);
+        }
+
+        return null;
+    }
+
+    /**
+     * Delete a category.
+     *
+     * @param categoryId
+     */
+    public static async deleteCategory(categoryId: number): Promise<true|GeneralErrorResponse> {
+        const response: AxiosResponse<ApiResponse<null>> = await Api.getInstance().delete(`/record/category/${categoryId}`);
+
+        if (response.status === 200) {
+            return true;
+        } else {
+            return new GeneralErrorResponse(response.data);
+        }
+    }
+
+    /**
+     * Delete a sub category.
+     *
+     * @param subCategoryId
+     */
+    public static async deleteSubCategory(subCategoryId: number): Promise<true|GeneralErrorResponse> {
+        const response: AxiosResponse<ApiResponse<null>> = await Api.getInstance().delete(`/record/subcategory/${subCategoryId}`);
+
+        if (response.status === 200) {
+            return true;
+        } else {
+            return new GeneralErrorResponse(response.data);
+        }
     }
 }
