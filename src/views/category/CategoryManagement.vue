@@ -29,7 +29,7 @@
 										</v-list-item-content>
 										<v-list-item-action>
 											<div class="flex">
-												<v-btn icon color="blue" @click.stop=""><v-icon small>mdi-lead-pencil</v-icon></v-btn>
+												<v-btn icon color="blue" @click.stop="openEditCategoryDialog(category)"><v-icon small>mdi-lead-pencil</v-icon></v-btn>
 												<v-btn icon color="red" @click.stop="deletionConfirm(category)"><v-icon small>mdi-delete</v-icon></v-btn>
 											</div>
 										</v-list-item-action>
@@ -58,7 +58,7 @@
 										</v-list-item-content>
 										<v-list-item-action>
 											<div class="flex">
-												<v-btn icon color="blue" @click.stop=""><v-icon small>mdi-lead-pencil</v-icon></v-btn>
+												<v-btn icon color="blue" @click.stop="openEditCategoryDialog(subCategory)"><v-icon small>mdi-lead-pencil</v-icon></v-btn>
 												<v-btn icon color="red" @click.stop="deletionConfirm(subCategory)"><v-icon small>mdi-delete</v-icon></v-btn>
 											</div>
 										</v-list-item-action>
@@ -144,6 +144,30 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
+
+		<v-dialog v-model="editCategoryDialog.display" max-width="400" :persistent="true">
+			<v-card>
+				<v-card-title>Edit {{ editCategoryDialog.title }}</v-card-title>
+				<v-card-text>
+					<v-form ref="editCategoryForm">
+						<v-text-field
+							label="name"
+							v-model="editCategoryDialog.name"
+							type="text"
+							autofocus
+							:rules="[rules.required]"
+							:disabled="editCategoryDialog.loading"
+							:error-messages="editCategoryDialog.errorMessage.name"
+						></v-text-field>
+					</v-form>
+				</v-card-text>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn text :disabled="editCategoryDialog.loading" @click="closeEditCategoryDialog">Cancel</v-btn>
+					<v-btn text color="primary" :disabled="editCategoryDialog.loading" @click="saveCategory">Update</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</div>
 </template>
 
@@ -194,6 +218,17 @@ export default Vue.extend({
 				createSubCategoryDialog: {
 					display: false,
 					loading: false,
+					name: "",
+					errorMessage: {
+						name: [],
+					}
+				},
+
+				editCategoryDialog: {
+					display: false,
+					loading: false,
+					title: "",
+					categoryInstance: null as RecordCategory|RecordSubCategory|null,
 					name: "",
 					errorMessage: {
 						name: [],
@@ -372,6 +407,33 @@ export default Vue.extend({
 					await this.loadSubCategories();
 					this.closeCreateSubCategoryDialog();
 				}
+			},
+
+			closeEditCategoryDialog() {
+				this.editCategoryDialog.display = false;
+				this.editCategoryDialog.loading = false;
+				this.editCategoryDialog.title = "";
+				this.editCategoryDialog.categoryInstance = null;
+				this.editCategoryDialog.name = "";
+				clearErrorMessages(this.editCategoryDialog.errorMessage);
+			},
+
+			openEditCategoryDialog(category: RecordCategory|RecordSubCategory) {
+				this.closeEditCategoryDialog();
+				this.editCategoryDialog.categoryInstance = category;
+				this.editCategoryDialog.name = category.name;
+
+				if (category instanceof RecordCategory) {
+					this.editCategoryDialog.title = "category";
+				} else {
+					this.editCategoryDialog.title = "sub-category";
+				}
+
+				this.editCategoryDialog.display = true;
+			},
+
+			async saveCategory() {
+				return null;
 			}
 		},
 
