@@ -23,8 +23,11 @@ export class PagedItemsDto<T> implements PagedItemsInterface<T> {
 }
 
 export default class PagedItems<T> extends PagedItemsDto<T> {
-    constructor(dto: PagedItemsDto<T>) {
+    constructor(dto: PagedItemsDto<T>|null = null) {
         super();
+        if (dto === null) {
+            dto = new PagedItemsDto<T>();
+        }
         Object.assign(this, dto);
     }
 }

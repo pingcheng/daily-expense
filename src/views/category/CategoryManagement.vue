@@ -170,13 +170,13 @@ export default Vue.extend({
 				categories: {} as PagedItems<RecordCategory>,
 				subCategories: {} as PagedItems<RecordSubCategory>,
 
-				selectedCategory: null,
-				selectedSubCategory: null,
+				selectedCategory: null as null|number,
+				selectedSubCategory: null as null|number,
 
 				rules: Rules,
 
 				deleteDialog: {
-					categoryInstance: null,
+					categoryInstance: null as RecordCategory|RecordSubCategory|null,
 					loading: false,
 				},
 
@@ -260,13 +260,13 @@ export default Vue.extend({
 
 			async deleteCategoryController() {
 				const instance = this.deleteDialog.categoryInstance;
-				if (typeof instance !== "object") {
+				if (instance === null) {
 					return;
 				}
 
 				switch (instance.constructor.name) {
-					case RecordSubCategory.name: await this.deleteSubCategory(instance); return;
-					case RecordCategory.name: await this.deleteCategory(instance); return;
+					case RecordSubCategory.name: await this.deleteSubCategory(instance as RecordSubCategory); return;
+					case RecordCategory.name: await this.deleteCategory(instance as RecordCategory); return;
 					default: alert("Not support yet"); return;
 				}
 			},
