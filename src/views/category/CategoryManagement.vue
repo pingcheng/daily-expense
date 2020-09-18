@@ -435,6 +435,8 @@ export default Vue.extend({
 			async saveCategoryController() {
 				if (this.editCategoryDialog.categoryInstance instanceof RecordCategory) {
 					await this.saveCategory();
+				} else if (this.editCategoryDialog.categoryInstance instanceof RecordSubCategory) {
+					await this.saveSubCategory();
 				}
 			},
 
@@ -456,6 +458,27 @@ export default Vue.extend({
 					alert(response.getErrorMessage());
 				} else {
 					await this.loadCategories();
+					this.closeEditCategoryDialog();
+				}
+			},
+
+			async saveSubCategory() {
+				if (!(this.editCategoryDialog.categoryInstance instanceof RecordSubCategory)) {
+					return;
+				}
+
+				const dto = new RecordCategoryDto();
+				dto.id = this.editCategoryDialog.categoryInstance.id;
+				dto.name = this.editCategoryDialog.name;
+
+				const response = await RecordCategoryService.updateSubCategory(dto);
+
+				if (response instanceof FormErrorResponse) {
+					applyErrorMessages(this.editCategoryDialog.errorMessage, response.getErrors());
+				} else if (response instanceof GeneralErrorResponse) {
+					alert(response.getErrorMessage());
+				} else {
+					await this.loadSubCategories();
 					this.closeEditCategoryDialog();
 				}
 			}

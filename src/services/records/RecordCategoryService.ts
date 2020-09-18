@@ -132,4 +132,21 @@ export default class RecordCategoryService {
             default: return new GeneralErrorResponse(response.data);
         }
     }
+
+    /**
+     * Update a sub category.
+     *
+     * @param subCategory
+     */
+    public static async updateSubCategory(subCategory: RecordSubCategoryDto): Promise<RecordSubCategory|FormErrorResponse|GeneralErrorResponse> {
+        const response: AxiosResponse<ApiResponse<RecordSubCategoryDto|FormError>> = await Api.getInstance().patch(`/record/subcategory/${subCategory.id}`, {
+            name: subCategory.name
+        });
+
+        switch (response.status) {
+            case 200: return new RecordSubCategory(response.data.payload as RecordSubCategoryDto);
+            case 422: return new FormErrorResponse(response.data.payload as FormError);
+            default: return new GeneralErrorResponse(response.data);
+        }
+    }
 }
