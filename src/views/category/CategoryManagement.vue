@@ -164,7 +164,7 @@
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn text :disabled="editCategoryDialog.loading" @click="closeEditCategoryDialog">Cancel</v-btn>
-					<v-btn text color="primary" :disabled="editCategoryDialog.loading" @click="saveCategory">Update</v-btn>
+					<v-btn text color="primary" :disabled="editCategoryDialog.loading" @click="saveCategoryController">Update</v-btn>
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
@@ -432,8 +432,32 @@ export default Vue.extend({
 				this.editCategoryDialog.display = true;
 			},
 
+			async saveCategoryController() {
+				if (this.editCategoryDialog.categoryInstance instanceof RecordCategory) {
+					await this.saveCategory();
+				}
+			},
+
 			async saveCategory() {
-				return null;
+
+				if (!(this.editCategoryDialog.categoryInstance instanceof RecordCategory)) {
+					return;
+				}
+
+				const dto = new RecordCategoryDto();
+				dto.id = this.editCategoryDialog.categoryInstance.id;
+				dto.name = this.editCategoryDialog.name;
+
+				const response = await RecordCategoryService.updateCategory(dto);
+
+				if (response instanceof FormErrorResponse) {
+					applyErrorMessages(this.editCategoryDialog.errorMessage, response.getErrors());
+				} else if (response instanceof GeneralErrorResponse) {
+					alert(response.getErrorMessage());
+				} else {
+					await this.loadCategories();
+					this.closeEditCategoryDialog();
+				}
 			}
 		},
 

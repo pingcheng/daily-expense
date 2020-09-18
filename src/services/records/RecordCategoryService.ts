@@ -115,4 +115,21 @@ export default class RecordCategoryService {
             return new GeneralErrorResponse(response.data);
         }
     }
+
+    /**
+     * Update a category
+     *
+     * @param category
+     */
+    public static async updateCategory(category: RecordCategoryDto): Promise<RecordCategory|FormErrorResponse|GeneralErrorResponse> {
+        const response: AxiosResponse<ApiResponse<RecordCategoryDto|FormError>> = await Api.getInstance().patch(`/record/category/${category.id}`, {
+            name: category.name
+        });
+
+        switch (response.status) {
+            case 200: return new RecordCategory(response.data.payload as RecordCategoryDto);
+            case 422: return new FormErrorResponse(response.data.payload as FormError);
+            default: return new GeneralErrorResponse(response.data);
+        }
+    }
 }

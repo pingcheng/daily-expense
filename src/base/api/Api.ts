@@ -71,6 +71,7 @@ export class Api {
         this.post = this.post.bind(this);
         this.put = this.put.bind(this);
         this.delete = this.delete.bind(this);
+        this.patch = this.patch.bind(this);
     }
 
     /**
@@ -131,6 +132,22 @@ export class Api {
      */
     public delete<T, R = AxiosResponse<T>> (url: string, config?: AxiosRequestConfig): Promise<R> {
         return this.api.delete(url, config);
+    }
+
+    /**
+     * HTTP PATCH method.
+     *
+     * @access public
+     * @template T - `TYPE`: expected object.
+     * @template B - `BODY`: body request object.
+     * @template R - `RESPONSE`: expected object inside a axios response format.
+     * @param {string} url - endpoint you want to reach.
+     * @param {B} data - payload to be send as the `request body`,
+     * @param {AxiosRequestConfig} [config] - axios request configuration.
+     * @returns {Promise<R>} - HTTP [axios] response payload.
+     */
+    public patch<T, B, R = AxiosResponse<T>> (url: string, data?: B, config?: AxiosRequestConfig): Promise<R> {
+        return this.api.patch(url, data, config);
     }
 }
 
