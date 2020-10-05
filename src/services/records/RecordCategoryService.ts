@@ -62,27 +62,27 @@ export default class RecordCategoryService {
     }
     
     public static async createCategory(categoryDto: RecordCategoryDto): Promise<RecordCategory|FormErrorResponse|GeneralErrorResponse> {
-        const response: AxiosResponse<ApiResponse<RecordCategoryDto|FormError|any>> = await Api.getInstance().put(`/record/category`, {
+        const response: AxiosResponse<ApiResponse<RecordCategoryDto|FormError>> = await Api.getInstance().put(`/record/category`, {
             name: categoryDto.name,
             type: categoryDto.type,
         });
 
         switch (response.status) {
-            case 200: return new RecordCategory(response.data.payload);
-            case 422: return new FormErrorResponse(response.data.payload);
-            default: return new GeneralErrorResponse(response.data.payload);
+            case 200: return new RecordCategory(response.data.payload as RecordCategoryDto);
+            case 422: return new FormErrorResponse(response.data.payload as FormError);
+            default: return new GeneralErrorResponse(response.data);
         }
     }
 
     public static async createSubCategory(categoryId: number, subCategoryDto: RecordSubCategoryDto): Promise<RecordSubCategory|FormErrorResponse|GeneralErrorResponse> {
-        const response: AxiosResponse<ApiResponse<RecordSubCategoryDto|FormError|any>> = await Api.getInstance().put(`/record/category/${categoryId}/subcategory`, {
+        const response: AxiosResponse<ApiResponse<RecordSubCategoryDto|FormError>> = await Api.getInstance().put(`/record/category/${categoryId}/subcategory`, {
             name: subCategoryDto.name
         });
 
         switch (response.status) {
-            case 200: return new RecordSubCategory(response.data.payload);
-            case 422: return new FormErrorResponse(response.data.payload);
-            default: return new GeneralErrorResponse(response.data.payload);
+            case 200: return new RecordSubCategory(response.data.payload as RecordSubCategoryDto);
+            case 422: return new FormErrorResponse(response.data.payload as FormError);
+            default: return new GeneralErrorResponse(response.data);
         }
     }
 
